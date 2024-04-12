@@ -37,6 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   graphql_flutter: ^5.1.2
   cached_network_image: ^3.3.1 
+  carousel_slider: ^4.0.0
+  curved_navigation_bar: ^1.0.3
+  
 
 dev_dependencies:
   flutter_test:

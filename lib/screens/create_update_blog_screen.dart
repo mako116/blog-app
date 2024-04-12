@@ -1,45 +1,16 @@
-// screens/create_update_blog_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:blogs/models/blog_post.dart';
-import 'package:blogs/services/graphql_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-const String createBlogPostMutation = """
-  mutation CreateBlogPost(\$title: String!, \$subTitle: String!, \$body: String!) {
-    createBlogPost(title: \$title, subTitle: \$subTitle, body: \$body) {
-      id
-      title
-      subTitle
-      body
-      dateCreated
-    }
-  }
-""";
+class UpdateBlogScreen extends StatefulWidget {
+  final Map<String, dynamic>? blog; // Change made to allow null value for blog
 
-const String updateBlogPostMutation = """
-  mutation UpdateBlogPost(\$blogId: String!, \$title: String!, \$subTitle: String!, \$body: String!) {
-    updateBlogPost(blogId: \$blogId, title: \$title, subTitle: \$subTitle, body: \$body) {
-      id
-      title
-      subTitle
-      body
-      dateCreated
-    }
-  }
-""";
-
-class CreateUpdateBlogScreen extends StatefulWidget {
-  final BlogPost? initialBlogPost;
-
-  const CreateUpdateBlogScreen({Key? key, this.initialBlogPost})
-      : super(key: key);
+  UpdateBlogScreen({this.blog}); // Change made to allow null value for blog
 
   @override
-  _CreateUpdateBlogScreenState createState() => _CreateUpdateBlogScreenState();
+  _UpdateBlogScreenState createState() => _UpdateBlogScreenState();
 }
 
-class _CreateUpdateBlogScreenState extends State<CreateUpdateBlogScreen> {
+class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
   late TextEditingController _titleController;
   late TextEditingController _subTitleController;
   late TextEditingController _bodyController;
@@ -47,150 +18,156 @@ class _CreateUpdateBlogScreenState extends State<CreateUpdateBlogScreen> {
   @override
   void initState() {
     super.initState();
-    _titleController =
-        TextEditingController(text: widget.initialBlogPost?.title ?? '');
-    _subTitleController =
-        TextEditingController(text: widget.initialBlogPost?.subTitle ?? '');
-    _bodyController =
-        TextEditingController(text: widget.initialBlogPost?.body ?? '');
+    _titleController = TextEditingController(
+        text: widget.blog?['title'] ?? ''); // Handle null value for blog
+    _subTitleController = TextEditingController(
+        text: widget.blog?['subTitle'] ?? ''); // Handle null value for blog
+    _bodyController = TextEditingController(
+        text: widget.blog?['body'] ?? ''); // Handle null value for blog
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _subTitleController.dispose();
+    _bodyController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _updateOrCreateBlogPost(BuildContext context) async {
+    final GraphQLClient? client = GraphQLProvider.of(context)?.value;
+
+    if (client == null) {
+      // Handle the case where client is null
+      return;
+    }
+
+    try {
+      final MutationOptions mutationOptions =
+          widget.blog != null // Check if blog is not null for update
+              ? MutationOptions(
+                  document: gql('''
+                mutation updateBlogPost(\$blogId: String!, \$title: String!, \$subTitle: String!, \$body: String!) {
+                  updateBlog(blogId: \$blogId, title: \$title, subTitle: \$subTitle, body: \$body) {
+                    success
+                    blogPost {
+                      id
+                      title
+                      subTitle
+                      body
+                      dateCreated
+                    }
+                  }
+                }
+              '''),
+                  variables: {
+                    'blogId': widget.blog?['id'], // Handle null value for blog
+                    'title': _titleController.text,
+                    'subTitle': _subTitleController.text,
+                    'body': _bodyController.text,
+                  },
+                )
+              : MutationOptions(
+                  document: gql('''
+                mutation createBlogPost(\$title: String!, \$subTitle: String!, \$body: String!) {
+                  createBlog(title: \$title, subTitle: \$subTitle, body: \$body) {
+                    success
+                    blogPost {
+                      id
+                      title
+                      subTitle
+                      body
+                      dateCreated
+                    }
+                  }
+                }
+              '''),
+                  variables: {
+                    'title': _titleController.text,
+                    'subTitle': _subTitleController.text,
+                    'body': _bodyController.text,
+                  },
+                );
+
+      final QueryResult result = await client.mutate(mutationOptions);
+
+      if (result.hasException) {
+        throw result.exception!;
+      }
+
+      final bool success = result.data?['updateBlog']?['success'] ??
+          result.data?['createBlog']?['success'];
+
+      if (success == true) {
+        // Blog post updated/created successfully
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Blog post ${widget.blog != null ? 'updated' : 'created'} successfully'),
+          ),
+        );
+        // Navigate back to the homepage
+        Navigator.pop(context);
+      } else {
+        throw Exception(
+            'Failed to ${widget.blog != null ? 'update' : 'create'} blog post');
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Error ${widget.blog != null ? 'updating' : 'creating'} blog post: $error'),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialBlogPost == null
-            ? 'Create Blog Post'
-            : 'Update Blog Post'),
+        title: Text(widget.blog != null
+            ? 'Update Blog'
+            : 'Create Blog'), // Update title based on operation
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
+            TextFormField(
               controller: _titleController,
               decoration: InputDecoration(labelText: 'Title'),
             ),
-            SizedBox(height: 16),
-            TextField(
+            TextFormField(
               controller: _subTitleController,
               decoration: InputDecoration(labelText: 'Subtitle'),
             ),
-            SizedBox(height: 16),
-            TextField(
+            TextFormField(
               controller: _bodyController,
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
               decoration: InputDecoration(labelText: 'Body'),
+              maxLines: null,
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                final title = _titleController.text;
-                final subTitle = _subTitleController.text;
-                final body = _bodyController.text;
-
-                if (title.isNotEmpty &&
-                    subTitle.isNotEmpty &&
-                    body.isNotEmpty) {
-                  // Create or update blog post
-                  final blogPost = BlogPost(
-                    id: widget.initialBlogPost?.id ?? '',
-                    title: title,
-                    subTitle: subTitle,
-                    body: body,
-                    dateCreated: DateTime.now().toString(), // Adjust as needed
-                  );
-
-                  if (widget.initialBlogPost == null) {
-                    // Create blog post
-                    _createBlogPost(blogPost);
-                  } else {
-                    // Update blog post
-                    _updateBlogPost(blogPost);
-                  }
-                } else {
-                  // Show error message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Please fill in all fields.'),
-                    ),
-                  );
-                }
+                _updateOrCreateBlogPost(
+                    context); // Use common method for update/create
               },
-              child: Text(widget.initialBlogPost == null ? 'Create' : 'Update'),
+              child: Text(widget.blog != null
+                  ? 'Update'
+                  : 'Create'), // Update button text based on operation
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate back to the homepage
+                Navigator.pop(context);
+              },
+              child: Text('Done'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  void _createBlogPost(BlogPost blogPost) async {
-    try {
-      final result = await GraphQLService.client.mutate(MutationOptions(
-        document: gql(createBlogPostMutation),
-        variables: {
-          'title': blogPost.title,
-          'subTitle': blogPost.subTitle,
-          'body': blogPost.body,
-        },
-      ));
-
-      if (result.hasException) {
-        // Handle mutation error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Failed to create blog post: ${result.exception.toString()}'),
-          ),
-        );
-      } else {
-        // Handle success
-        Navigator.pop(context, true); // Navigate back and signal success
-      }
-    } catch (e) {
-      // Handle network error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to create blog post: $e'),
-        ),
-      );
-    }
-  }
-
-  void _updateBlogPost(BlogPost blogPost) async {
-    try {
-      final result = await GraphQLService.client.mutate(MutationOptions(
-        document: gql(updateBlogPostMutation),
-        variables: {
-          'blogId': blogPost.id,
-          'title': blogPost.title,
-          'subTitle': blogPost.subTitle,
-          'body': blogPost.body,
-        },
-      ));
-
-      if (result.hasException) {
-        // Handle mutation error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Failed to update blog post: ${result.exception.toString()}'),
-          ),
-        );
-      } else {
-        // Handle success
-        Navigator.pop(context, true); // Navigate back and signal success
-      }
-    } catch (e) {
-      // Handle network error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update blog post: $e'),
-        ),
-      );
-    }
   }
 }
