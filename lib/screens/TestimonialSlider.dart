@@ -100,20 +100,3 @@ class _TestimonialSliderState extends State<TestimonialSlider> {
     );
   }
 }
-
-// Use this TestimonialSlider widget in your main screen or any other screen
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Testimonial Slider'),
-        ),
-        body: Center(
-          child: TestimonialSlider(),
-        ),
-      ),
-    );
-  }
-}

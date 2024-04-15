@@ -1,13 +1,37 @@
-import 'package:blogs/screens/TestimonialSlider.dart';
-import 'package:blogs/screens/create_update_blog_screen.dart';
-import 'package:blogs/widgets/TestimonialDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:blogs/screens/create_update_blog_screen.dart';
 
-class BlogDetailsScreen extends StatelessWidget {
+class BlogDetailsScreen extends StatefulWidget {
   final String blogId;
 
   BlogDetailsScreen({required this.blogId});
+
+  @override
+  _BlogDetailsScreenState createState() => _BlogDetailsScreenState();
+}
+
+class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
+  late String _backgroundImage = 'images/1.jpg';
+
+  @override
+  void initState() {
+    super.initState();
+    _setBackgroundImage(widget.blogId);
+  }
+
+  Future<void> _setBackgroundImage(String blogId) async {
+    // Placeholder logic to determine background image based on blogId
+    String newBackgroundImage = 'images/2.jpg';
+    if (blogId == '1') {
+      newBackgroundImage = 'images/3.jpg';
+    } else if (blogId == '2') {
+      newBackgroundImage = 'images/4.jpg';
+    }
+    setState(() {
+      _backgroundImage = newBackgroundImage;
+    });
+  }
 
   Future<void> deleteBlogPost(BuildContext context, String blogId) async {
     final GraphQLClient? client = GraphQLProvider.of(context)?.value;
@@ -42,7 +66,7 @@ class BlogDetailsScreen extends StatelessWidget {
       final bool success = result.data?['deleteBlog']['success'];
 
       if (success == true) {
-        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/'); // Push homepage again
       } else {
         throw Exception('Failed to delete blog post');
       }
@@ -59,22 +83,50 @@ class BlogDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+          height: 300, // Set height to 300px
+          width: double.infinity,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(_backgroundImage),
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+        ),
         title: Text('Blog Details'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to previous screen
+          },
+        ),
       ),
       body: Query(
         options: QueryOptions(
           document: gql('''
-            query getBlog(\$blogId: String!) {
-              blogPost(blogId: \$blogId) {
-                id
-                title
-                subTitle
-                body
-                dateCreated
-              }
-            }
-          '''),
-          variables: {'blogId': blogId},
+        query getBlog(\$blogId: String!) {
+          blogPost(blogId: \$blogId) {
+            id
+            title
+            subTitle
+            body
+            dateCreated
+          }
+        }
+      '''),
+          variables: {'blogId': widget.blogId},
         ),
         builder: (QueryResult result, {refetch, fetchMore}) {
           if (result.hasException) {
@@ -90,6 +142,11 @@ class BlogDetailsScreen extends StatelessWidget {
           if (blog == null) {
             return Text('No blog details available');
           }
+
+          // Format date
+          final DateTime dateCreated = DateTime.parse(blog['dateCreated']);
+          final formattedDate =
+              '${dateCreated.day}/${dateCreated.month}/${dateCreated.year}';
 
           return SingleChildScrollView(
             child: Padding(
@@ -112,6 +169,12 @@ class BlogDetailsScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: 16),
+                  // Displaying formatted date
+                  Text(
+                    'Date: $formattedDate',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -125,20 +188,32 @@ class BlogDetailsScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        child: Text('Update'),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.green), // Update button color
+                        ),
+                        child: Text(
+                          'Update',
+                          style: TextStyle(
+                              color: Colors.white), // Update button text color
+                        ),
                       ),
                       ElevatedButton(
-                        onPressed: () async {
-                          await deleteBlogPost(context, blog['id']);
+                        onPressed: () {
+                          deleteBlogPost(context, blog['id']);
                         },
-                        child: Text('Delete'),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.red), // Delete button color
+                        ),
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(
+                              color: Colors.white), // Delete button text color
+                        ),
                       ),
                     ],
                   ),
-                  Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 15)),
-                  TestimonialDetails()
                 ],
               ),
             ),

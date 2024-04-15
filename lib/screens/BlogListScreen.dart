@@ -54,111 +54,139 @@ class BlogListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Query(
-        options: QueryOptions(
-          document: gql('''
-            query fetchAllBlogs {
-              allBlogPosts {
-                id
-                title
-                subTitle
-                body
-                dateCreated
+      body: Container(
+        height: 700, // Set body height to 700px
+        child: Query(
+          options: QueryOptions(
+            document: gql('''
+              query fetchAllBlogs {
+                allBlogPosts {
+                  id
+                  title
+                  subTitle
+                  body
+                  dateCreated
+                }
               }
+            '''),
+          ),
+          builder: (QueryResult result, {refetch, fetchMore}) {
+            if (result.hasException) {
+              return Text('Error fetching blogs: ${result.exception}');
             }
-          '''),
-        ),
-        builder: (QueryResult result, {refetch, fetchMore}) {
-          if (result.hasException) {
-            return Text('Error fetching blogs: ${result.exception}');
-          }
 
-          if (result.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
+            if (result.isLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-          final List? blogs = result.data?['allBlogPosts'];
+            final List? blogs = result.data?['allBlogPosts'];
 
-          if (blogs == null || blogs.isEmpty) {
-            return Text('No blogs available');
-          }
+            if (blogs == null || blogs.isEmpty) {
+              return Text('No blogs available');
+            }
 
-          return Card(
-            elevation: 4,
-            margin: EdgeInsets.all(12),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'TRENDING ',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 3,
-                          color: Colors.black.withOpacity(0.5),
-                          offset: Offset(2, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: blogs.length,
-                    itemBuilder: (context, index) {
-                      final blog = blogs[index];
-
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                        ),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal: 10,
-                          ),
-                          title: Text(
-                            blog['title'] ?? '',
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Card(
+                    elevation: 4,
+                    margin: EdgeInsets.all(12),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'TRENDING ',
                             style: TextStyle(
-                              fontSize: 20.0,
+                              fontSize: 36,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xff4c53a5),
+                              color: Colors.red,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 3,
+                                  color: Colors.black.withOpacity(0.5),
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
                             ),
                           ),
-                          subtitle: Text(blog['subTitle'] ?? ''),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BlogDetailsScreen(
-                                  blogId: blog['id'] ?? '',
+                        ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: blogs.length,
+                          itemBuilder: (context, index) {
+                            final blog = blogs[index];
+                            final DateTime? date = blog['dateCreated'] != null
+                                ? DateTime.parse(blog['dateCreated'])
+                                : null;
+
+                            return Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 1.0,
+                                  ),
                                 ),
+                              ),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 0,
+                                  horizontal: 10,
+                                ),
+                                title: Text(
+                                  blog['title'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xff4c53a5),
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(blog['subTitle'] ?? ''),
+                                    Text(
+                                      'Created on: ${date?.day}/${date?.year}',
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlogDetailsScreen(
+                                        blogId: blog['id'] ?? '',
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             );
                           },
                         ),
-                      );
-                    },
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                ),
-                TestimonialSlider(),
-              ],
-            ),
-          );
-        },
+                  SizedBox(
+                      height:
+                          120), // Add space between blog list and testimonial
+                  TestimonialSlider(
+                      // Set margin top for testimonial
+                      ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

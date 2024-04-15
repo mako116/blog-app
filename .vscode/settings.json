@@ -1,0 +1,4 @@
+{
+    "avdmanager.executable": "c:\\Src\\flutter\\cmdline-tools\\lib\\avdmanager-classpath.jar",
+    "avdmanager.sdkManager": "c:\\Src\\flutter\\cmdline-tools\\lib\\sdk-common\\tools.sdk-common.jar"
+}

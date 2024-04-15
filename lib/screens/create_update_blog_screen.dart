@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class UpdateBlogScreen extends StatefulWidget {
-  final Map<String, dynamic>? blog; // Change made to allow null value for blog
+  final Map<String, dynamic>? blog;
 
-  UpdateBlogScreen({this.blog}); // Change made to allow null value for blog
+  UpdateBlogScreen({this.blog});
 
   @override
   _UpdateBlogScreenState createState() => _UpdateBlogScreenState();
@@ -18,12 +18,10 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(
-        text: widget.blog?['title'] ?? ''); // Handle null value for blog
-    _subTitleController = TextEditingController(
-        text: widget.blog?['subTitle'] ?? ''); // Handle null value for blog
-    _bodyController = TextEditingController(
-        text: widget.blog?['body'] ?? ''); // Handle null value for blog
+    _titleController = TextEditingController(text: widget.blog?['title'] ?? '');
+    _subTitleController =
+        TextEditingController(text: widget.blog?['subTitle'] ?? '');
+    _bodyController = TextEditingController(text: widget.blog?['body'] ?? '');
   }
 
   @override
@@ -38,15 +36,13 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
     final GraphQLClient? client = GraphQLProvider.of(context)?.value;
 
     if (client == null) {
-      // Handle the case where client is null
       return;
     }
 
     try {
-      final MutationOptions mutationOptions =
-          widget.blog != null // Check if blog is not null for update
-              ? MutationOptions(
-                  document: gql('''
+      final MutationOptions mutationOptions = widget.blog != null
+          ? MutationOptions(
+              document: gql('''
                 mutation updateBlogPost(\$blogId: String!, \$title: String!, \$subTitle: String!, \$body: String!) {
                   updateBlog(blogId: \$blogId, title: \$title, subTitle: \$subTitle, body: \$body) {
                     success
@@ -60,15 +56,15 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   }
                 }
               '''),
-                  variables: {
-                    'blogId': widget.blog?['id'], // Handle null value for blog
-                    'title': _titleController.text,
-                    'subTitle': _subTitleController.text,
-                    'body': _bodyController.text,
-                  },
-                )
-              : MutationOptions(
-                  document: gql('''
+              variables: {
+                'blogId': widget.blog?['id'],
+                'title': _titleController.text,
+                'subTitle': _subTitleController.text,
+                'body': _bodyController.text,
+              },
+            )
+          : MutationOptions(
+              document: gql('''
                 mutation createBlogPost(\$title: String!, \$subTitle: String!, \$body: String!) {
                   createBlog(title: \$title, subTitle: \$subTitle, body: \$body) {
                     success
@@ -82,12 +78,12 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   }
                 }
               '''),
-                  variables: {
-                    'title': _titleController.text,
-                    'subTitle': _subTitleController.text,
-                    'body': _bodyController.text,
-                  },
-                );
+              variables: {
+                'title': _titleController.text,
+                'subTitle': _subTitleController.text,
+                'body': _bodyController.text,
+              },
+            );
 
       final QueryResult result = await client.mutate(mutationOptions);
 
@@ -99,15 +95,14 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
           result.data?['createBlog']?['success'];
 
       if (success == true) {
-        // Blog post updated/created successfully
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
                 'Blog post ${widget.blog != null ? 'updated' : 'created'} successfully'),
           ),
         );
-        // Navigate back to the homepage
-        Navigator.pop(context);
+        Navigator.pop(context); // Pop current screen
+        Navigator.pushReplacementNamed(context, '/'); // Push homepage again
       } else {
         throw Exception(
             'Failed to ${widget.blog != null ? 'update' : 'create'} blog post');
@@ -126,9 +121,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.blog != null
-            ? 'Update Blog'
-            : 'Create Blog'), // Update title based on operation
+        title: Text(widget.blog != null ? 'Update Blog' : 'Create Blog'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -151,16 +144,12 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                _updateOrCreateBlogPost(
-                    context); // Use common method for update/create
+                _updateOrCreateBlogPost(context);
               },
-              child: Text(widget.blog != null
-                  ? 'Update'
-                  : 'Create'), // Update button text based on operation
+              child: Text(widget.blog != null ? 'Update' : 'Create'),
             ),
             ElevatedButton(
               onPressed: () {
-                // Navigate back to the homepage
                 Navigator.pop(context);
               },
               child: Text('Done'),

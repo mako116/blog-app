@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       client: client,
       child: CacheProvider(
         child: MaterialApp(
-          title: 'Blog  App',
+          title: 'Blogs',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
