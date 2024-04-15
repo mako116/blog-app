@@ -5,8 +5,14 @@ import 'package:blogs/screens/blog_detail_screen.dart';
 import 'package:blogs/screens/create_update_blog_screen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
-class BlogListScreen extends StatelessWidget {
+class BlogListScreen extends StatefulWidget {
+  @override
+  _BlogListScreenState createState() => _BlogListScreenState();
+}
+
+class _BlogListScreenState extends State<BlogListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  Map<String, bool> bookmarkedBlogs = {};
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +127,9 @@ class BlogListScreen extends StatelessWidget {
                                 ? DateTime.parse(blog['dateCreated'])
                                 : null;
 
+                            final bool isBookmarked =
+                                bookmarkedBlogs[blog['id']] ?? false;
+
                             return Container(
                               decoration: BoxDecoration(
                                 border: Border(
@@ -135,13 +144,34 @@ class BlogListScreen extends StatelessWidget {
                                   vertical: 0,
                                   horizontal: 10,
                                 ),
-                                title: Text(
-                                  blog['title'] ?? '',
-                                  style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff4c53a5),
-                                  ),
+                                title: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        blog['title'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xff4c53a5),
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.bookmark,
+                                          color: isBookmarked
+                                              ? Colors.yellow
+                                              : null),
+                                      onPressed: () {
+                                        // Toggle the bookmark state for the blog entry
+                                        setState(() {
+                                          bookmarkedBlogs[blog['id']] =
+                                              !isBookmarked;
+                                        });
+                                      },
+                                    ),
+                                  ],
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
