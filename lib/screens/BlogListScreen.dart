@@ -17,12 +17,9 @@ class BlogListScreen extends StatelessWidget {
           Stack(
             children: [
               Container(
-                constraints: BoxConstraints(
-                  maxWidth: 150,
-                  maxHeight: 50,
-                ),
+                constraints: BoxConstraints(maxWidth: 140, maxHeight: 50),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
