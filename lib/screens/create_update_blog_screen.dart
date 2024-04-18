@@ -4,7 +4,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 class UpdateBlogScreen extends StatefulWidget {
   final Map<String, dynamic>? blog;
 
-  UpdateBlogScreen({this.blog});
+  const UpdateBlogScreen({super.key, this.blog});
 
   @override
   _UpdateBlogScreenState createState() => _UpdateBlogScreenState();
@@ -33,11 +33,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
   }
 
   Future<void> _updateOrCreateBlogPost(BuildContext context) async {
-    final GraphQLClient? client = GraphQLProvider.of(context)?.value;
-
-    if (client == null) {
-      return;
-    }
+    final GraphQLClient client = GraphQLProvider.of(context).value;
 
     try {
       final MutationOptions mutationOptions = widget.blog != null
@@ -130,18 +126,18 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
           children: [
             TextFormField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Title'),
+              decoration: const InputDecoration(labelText: 'Title'),
             ),
             TextFormField(
               controller: _subTitleController,
-              decoration: InputDecoration(labelText: 'Subtitle'),
+              decoration: const InputDecoration(labelText: 'Subtitle'),
             ),
             TextFormField(
               controller: _bodyController,
-              decoration: InputDecoration(labelText: 'Body'),
+              decoration: const InputDecoration(labelText: 'Body'),
               maxLines: null,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 _updateOrCreateBlogPost(context);
@@ -152,7 +148,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Done'),
+              child: const Text('Done'),
             ),
           ],
         ),

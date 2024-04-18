@@ -5,7 +5,7 @@ import 'package:blogs/screens/create_update_blog_screen.dart';
 class BlogDetailsScreen extends StatefulWidget {
   final String blogId;
 
-  BlogDetailsScreen({required this.blogId});
+  const BlogDetailsScreen({super.key, required this.blogId});
 
   @override
   _BlogDetailsScreenState createState() => _BlogDetailsScreenState();
@@ -34,16 +34,7 @@ class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
   }
 
   Future<void> deleteBlogPost(BuildContext context, String blogId) async {
-    final GraphQLClient? client = GraphQLProvider.of(context)?.value;
-
-    if (client == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('GraphQL client is null'),
-        ),
-      );
-      return;
-    }
+    final GraphQLClient client = GraphQLProvider.of(context).value;
 
     try {
       final QueryResult result = await client.mutate(
@@ -91,7 +82,7 @@ class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
               image: AssetImage(_backgroundImage),
               fit: BoxFit.cover,
             ),
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10),
             ),
@@ -100,14 +91,14 @@ class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
                 color: Colors.black.withOpacity(0.3),
                 spreadRadius: 2,
                 blurRadius: 4,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
         ),
-        title: Text('Blog Details'),
+        title: const Text('Blog Details'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Navigate back to previous screen
           },
@@ -134,13 +125,13 @@ class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
           }
 
           if (result.isLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           final blog = result.data?['blogPost'];
 
           if (blog == null) {
-            return Text('No blog details available');
+            return const Text('No blog details available');
           }
 
           // Format date
@@ -150,31 +141,31 @@ class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
 
           return SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     blog['title'] ?? '',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     blog['subTitle'] ?? '',
-                    style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                    style: const TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     blog['body'] ?? '',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   // Displaying formatted date
                   Text(
                     'Date: $formattedDate',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -192,7 +183,7 @@ class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
                           backgroundColor: MaterialStateProperty.all<Color>(
                               Colors.green), // Update button color
                         ),
-                        child: Text(
+                        child: const Text(
                           'Update',
                           style: TextStyle(
                               color: Colors.white), // Update button text color
@@ -206,7 +197,7 @@ class _BlogDetailsScreenState extends State<BlogDetailsScreen> {
                           backgroundColor: MaterialStateProperty.all<Color>(
                               Colors.red), // Delete button color
                         ),
-                        child: Text(
+                        child: const Text(
                           'Delete',
                           style: TextStyle(
                               color: Colors.white), // Delete button text color

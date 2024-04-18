@@ -6,6 +6,8 @@ import 'package:blogs/screens/create_update_blog_screen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class BlogListScreen extends StatefulWidget {
+  const BlogListScreen({super.key});
+
   @override
   _BlogListScreenState createState() => _BlogListScreenState();
 }
@@ -18,14 +20,14 @@ class _BlogListScreenState extends State<BlogListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TC Founders'),
+        title: const Text('TC Founders'),
         actions: [
           Stack(
             children: [
               Container(
-                constraints: BoxConstraints(maxWidth: 140, maxHeight: 50),
+                constraints: const BoxConstraints(maxWidth: 140, maxHeight: 50),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
@@ -34,7 +36,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(
+                        borderSide: const BorderSide(
                           color: Colors.black,
                           width: 0.2,
                         ),
@@ -50,7 +52,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 right: 8,
                 top: 8,
                 child: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: () {
                     _performSearch(context, _searchController.text);
                   },
@@ -60,7 +62,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
           ),
         ],
       ),
-      body: Container(
+      body: SizedBox(
         height: 700, // Set body height to 700px
         child: Query(
           options: QueryOptions(
@@ -82,13 +84,13 @@ class _BlogListScreenState extends State<BlogListScreen> {
             }
 
             if (result.isLoading) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             final List? blogs = result.data?['allBlogPosts'];
 
             if (blogs == null || blogs.isEmpty) {
-              return Text('No blogs available');
+              return const Text('No blogs available');
             }
 
             return SingleChildScrollView(
@@ -96,7 +98,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 children: [
                   Card(
                     elevation: 4,
-                    margin: EdgeInsets.all(12),
+                    margin: const EdgeInsets.all(12),
                     child: Column(
                       children: [
                         Padding(
@@ -111,7 +113,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                                 Shadow(
                                   blurRadius: 3,
                                   color: Colors.black.withOpacity(0.5),
-                                  offset: Offset(2, 2),
+                                  offset: const Offset(2, 2),
                                 ),
                               ],
                             ),
@@ -119,7 +121,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                         ),
                         ListView.builder(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: blogs.length,
                           itemBuilder: (context, index) {
                             final blog = blogs[index];
@@ -131,7 +133,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                                 bookmarkedBlogs[blog['id']] ?? false;
 
                             return Container(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
                                     color: Colors.grey,
@@ -140,7 +142,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                                 ),
                               ),
                               child: ListTile(
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0,
                                   horizontal: 10,
                                 ),
@@ -151,7 +153,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                                     Expanded(
                                       child: Text(
                                         blog['title'] ?? '',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold,
                                           color: Color(0xff4c53a5),
@@ -179,7 +181,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                                     Text(blog['subTitle'] ?? ''),
                                     Text(
                                       'Created on: ${date?.day}/${date?.year}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontStyle: FontStyle.italic,
                                       ),
                                     ),
@@ -199,17 +201,17 @@ class _BlogListScreenState extends State<BlogListScreen> {
                             );
                           },
                         ),
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: 10, vertical: 10),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                       height:
                           120), // Add space between blog list and testimonial
-                  TestimonialSlider(
+                  const TestimonialSlider(
                       // Set margin top for testimonial
                       ),
                 ],
@@ -223,19 +225,19 @@ class _BlogListScreenState extends State<BlogListScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UpdateBlogScreen(
+              builder: (context) => const UpdateBlogScreen(
                 blog: null,
               ),
             ),
           );
         },
-        child: Icon(Icons.create),
+        child: const Icon(Icons.create),
       ),
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Colors.transparent,
-        color: Color(0xff4c53a5),
+        color: const Color(0xff4c53a5),
         height: 70,
-        items: [
+        items: const [
           Icon(
             Icons.home,
             size: 30,

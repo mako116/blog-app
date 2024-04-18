@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class TestimonialDetails extends StatefulWidget {
+  const TestimonialDetails({super.key});
+
   @override
   _TestimonialSliderState createState() => _TestimonialSliderState();
 }
@@ -52,8 +54,8 @@ class _TestimonialSliderState extends State<TestimonialDetails> {
           itemCount: testimonials.length,
           itemBuilder: (BuildContext context, int index, int realIndex) {
             return Container(
-              margin: EdgeInsets.symmetric(horizontal: 24.0),
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+              margin: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -61,7 +63,7 @@ class _TestimonialSliderState extends State<TestimonialDetails> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
                 borderRadius: BorderRadius.circular(10),
@@ -93,26 +95,26 @@ class _TestimonialSliderState extends State<TestimonialDetails> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
                     testimonials[index]['name'],
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     testimonials[index]['text'],
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       testimonials[index]['rating'],
-                      (index) => Icon(Icons.star, color: Colors.yellow),
+                      (index) => const Icon(Icons.star, color: Colors.yellow),
                     ),
                   ),
                 ],
@@ -122,7 +124,7 @@ class _TestimonialSliderState extends State<TestimonialDetails> {
           options: CarouselOptions(
             height: 200,
             autoPlay: true,
-            autoPlayInterval: Duration(seconds: 5),
+            autoPlayInterval: const Duration(seconds: 5),
             onPageChanged: (index, reason) {
               setState(() {
                 _currentIndex = index;
@@ -130,7 +132,7 @@ class _TestimonialSliderState extends State<TestimonialDetails> {
             },
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: testimonials.map((testimonial) {
@@ -138,7 +140,7 @@ class _TestimonialSliderState extends State<TestimonialDetails> {
             return Container(
               width: 8.0,
               height: 8.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+              margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: _currentIndex == index ? Colors.blue : Colors.grey,
@@ -153,14 +155,16 @@ class _TestimonialSliderState extends State<TestimonialDetails> {
 
 // Use this TestimonialSlider widget in your main screen or any other screen
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Testimonial Slider'),
+          title: const Text('Testimonial Slider'),
         ),
-        body: Center(
+        body: const Center(
           child: TestimonialDetails(),
         ),
       ),

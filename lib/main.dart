@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     final HttpLink httpLink = HttpLink('https://uat-api.vmodel.app/graphql/');
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           routes: {
-            "/": (context) => BlogListScreen(),
+            "/": (context) => const BlogListScreen(),
           },
         ),
       ),
